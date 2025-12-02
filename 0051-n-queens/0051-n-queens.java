@@ -1,51 +1,77 @@
 class Solution {
-    
-    public boolean checkDiagonal(int row, int col, int n, List<StringBuilder> board) {
-        int r = row, c = col;
-        while (r >= 0 && c >= 0) {
-            if (board.get(r).charAt(c) == 'Q') return false;
-            r--; c--;
+
+    public boolean issafe(int row, int col, char[][] board){
+        //horizontal checkk
+        for(int j=0; j<board.length; j++){
+            if(board[row][j]=='Q') return false;
         }
-        r = row; c = col;
-        while (r >= 0 && c < n) {
-            if (board.get(r).charAt(c) == 'Q') return false;
-            r--; c++;
+
+        // vertical checkk
+        for(int i=0; i<board.length; i++){
+            if(board[i][col]=='Q') return false;
         }
+        //upper left
+        int r=row;
+        for(int c=col; c>=0 && r>=0; c--, r--){
+            if(board[r][c]=='Q') return false;
+        }
+
+        //upper right
+        r=row;
+        for(int c=col; c<board.length && r>=0; r--, c++){
+            if(board[r][c]=='Q') return false;
+        }
+
+        //lower left
+
+        r=row;
+        for(int c=col; c>=0 && r<board.length; r++, c--){
+            if(board[r][c]=='Q') return false;
+        }
+
+        //lower right
+
+        r=row;
+        for(int c=col; c<board.length && r<board.length; r++, c++){
+            if(board[r][c]=='Q') return false;
+        }
+
         return true;
+
+
     }
 
-    public void solve(List<List<String>> ans, List<StringBuilder> board, boolean column[], int row, int n) {
-        if (row == n) {
-            List<String> temp = new ArrayList<>();
-            for (StringBuilder sb : board)
-                temp.add(sb.toString());
-            ans.add(temp);
-            return;
+    public void saveboard(char[][] board, List<List<String>> allboards){
+        String row="";
+        List<String> newboard=new ArrayList<>();
+        for(int i=0; i<board.length; i++){
+            row="";
+            for(int j=0; j<board[0].length; j++){
+                if(board[i][j]=='Q') row+='Q';
+                else row+='.';
+            }
+            newboard.add(row);
         }
+        allboards.add(newboard);
+    }
 
-        for (int col = 0; col < n; col++) {
-            if (!column[col] && checkDiagonal(row, col, n, board)) {
-                column[col] = true;
-                board.get(row).setCharAt(col, 'Q');
-                solve(ans, board, column, row + 1, n);
-                board.get(row).setCharAt(col, '.');
-                column[col] = false;
+    public void helper(char [][] board, List<List<String>> allboards, int col){
+        if(col==board.length){
+            saveboard(board, allboards);
+        }
+        for(int row=0; row<board.length; row++){
+            if(issafe(row, col, board)){
+                board[row][col]='Q';
+                helper(board, allboards, col+1);
+                board[row][col]='.';
             }
         }
     }
-
     public List<List<String>> solveNQueens(int n) {
-        List<List<String>> ans = new ArrayList<>();
-        List<StringBuilder> board = new ArrayList<>();
-        boolean column[] = new boolean[n];
-
-        for (int i = 0; i < n; i++) {
-            StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < n; j++) sb.append('.');
-            board.add(sb);
-        }
-
-        solve(ans, board, column, 0, n);
-        return ans;
+        List<List<String>> allboards=new ArrayList<>();
+        char[][] board=new char[n][n];
+        helper(board, allboards, 0);
+        return allboards;
+        
     }
 }
