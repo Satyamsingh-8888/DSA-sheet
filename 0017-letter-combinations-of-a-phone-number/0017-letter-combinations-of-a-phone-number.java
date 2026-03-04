@@ -1,24 +1,31 @@
-class Solution {
-    static String[]map= {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
-    public List<String> letterCombinations(String digits) {
-        List<String> list=new ArrayList<>();
-        if(digits.length()==0){
-            return list;
-        }
+import java.util.*;
 
-        combination(digits, list, "");
-        return list;
+class Solution {
+    public List<String> letterCombinations(String digits) {
+        List<String> result = new ArrayList<>();
+        if (digits == null || digits.length() == 0) return result;
+
+        String[] map = {
+            "", "", "abc", "def", "ghi", "jkl",
+            "mno", "pqrs", "tuv", "wxyz"
+        };
+
+        backtrack(result, digits, map, 0, new StringBuilder());
+        return result;
     }
-    public static void combination(String str, List<String> list, String ans){
-        if(str.length()==0){
-            list.add(ans);
+
+    private void backtrack(List<String> result, String digits, String[] map, int index, StringBuilder current) {
+        if (index == digits.length()) {
+            result.add(current.toString());
             return;
         }
-        char ch=str.charAt(0);
-        int num=ch-'0';
-        String press=map[num];
-        for(int i=0; i<press.length(); i++){
-            combination(str.substring(1), list, ans+press.charAt(i));
+
+        String letters = map[digits.charAt(index) - '0'];
+
+        for (char c : letters.toCharArray()) {
+            current.append(c);
+            backtrack(result, digits, map, index + 1, current);
+            current.deleteCharAt(current.length() - 1);
         }
     }
 }
