@@ -1,28 +1,24 @@
 class Solution {
     public boolean canPartition(int[] nums) {
         int n=nums.length;
-        int totalsum=0;
-        for(int num: nums) totalsum+=num;
-
-        if(totalsum%2!=0) return false;
-
-        int target=totalsum/2;
-
-        Boolean dp[][]=new Boolean[n+1][target+1];
-        return solve(nums, n, target, dp);
-    }
-
-    private Boolean solve(int arr[], int n, int target, Boolean dp[][]){
-        if(target==0) return true;
-        if(n==0) return false;
-        if(dp[n][target]!=null) return dp[n][target];
-
-        if(arr[n-1]<=target){
-            dp[n][target]=solve(arr, n-1, target-arr[n-1], dp)|| solve(arr, n-1, target, dp);
-        }else{
-            dp[n][target]=solve(arr, n-1, target, dp);
+        int sum=0;
+        for(int num: nums) sum+=num;
+        if(sum%2!=0) return false;
+        int W=sum/2;
+        boolean[][] dp=new boolean[n+1][W+1];
+        for(int i=0; i<n+1; i++){
+            dp[i][0]=true;
         }
 
-        return dp[n][target];
+        for(int i=1; i<n+1; i++){
+            for(int w=1; w<W+1; w++){
+                if(nums[i-1]<=w){
+                    dp[i][w]=dp[i-1][w-nums[i-1]]|| dp[i-1][w];
+                }else{
+                    dp[i][w]=dp[i-1][w];
+                }
+            }
+        }
+        return dp[n][W];
     }
 }
