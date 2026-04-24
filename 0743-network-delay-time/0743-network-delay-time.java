@@ -1,51 +1,55 @@
 class Solution {
-
+    static class Pair{
+        int node;
+        int time;
+        Pair(int node, int time){
+            this.node=node;
+            this.time=time;
+        }
+    }
     public int networkDelayTime(int[][] times, int n, int k) {
-
-        ArrayList<ArrayList<int[]>> adj = new ArrayList<>();
-        for (int i = 0; i <= n; i++) {
-            adj.add(new ArrayList<>());
+        List<List<Pair>> graph=new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int t[]: times){
+            int u=t[0];
+            int v=t[1];
+            int w=t[2];
+            graph.get(u).add(new Pair(v, w));
         }
 
-        for (int[] edge : times) {
-            int u = edge[0];
-            int v = edge[1];
-            int w = edge[2];
-
-            adj.get(u).add(new int[]{v, w});
-        }
-
-        int[] dist = new int[n + 1];
+        PriorityQueue<Pair> pq=new PriorityQueue<>((a, b)->a.time-b.time);
+        int dist[]=new int[n+1];
         Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[k]=0;
+        pq.offer(new Pair(k, 0));
 
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);
-        dist[k] = 0;
-        pq.offer(new int[]{k, 0});
+        while(!pq.isEmpty()){
+            Pair curr=pq.poll();
+            int node=curr.node;
+            int time=curr.time;
+            if(time>dist[node]) continue;
 
-        while (!pq.isEmpty()) {
-            int[] curr = pq.poll();
-            int node = curr[0];
-            int time = curr[1];
-
-            if (time > dist[node]) continue;
-
-            for (int[] neighbor : adj.get(node)) {
-                int newNode = neighbor[0];
-                int weight = neighbor[1];
-
-                if (time + weight < dist[newNode]) {
-                    dist[newNode] = time + weight;
-                    pq.offer(new int[]{newNode, dist[newNode]});
+            for(Pair nei: graph.get(node)){
+                int v=nei.node;
+                int w=nei.time;
+                if(dist[v]>time+w){
+                    dist[v]=time+w;
                 }
+                    pq.offer(new Pair(v, dist[v]));
+                
             }
         }
 
-        int maxTime = 0;
-        for (int i = 1; i <= n; i++) {
-            if (dist[i] == Integer.MAX_VALUE) return -1;
-            maxTime = Math.max(maxTime, dist[i]);
-        }
+        int ans=0;
+        for(int i=1; i<=n; i++){
+            if(dist[i]==Integer.MAX_VALUE){
+                return -1;
+            }
+            ans=Math.max(ans, dist[i]); 
 
-        return maxTime;
+        }
+        return ans;
     }
 }
